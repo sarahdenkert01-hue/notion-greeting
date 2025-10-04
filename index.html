@@ -1,82 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="transparent" />
-  <title>Notion Transparent Clock + Greeting</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notion Clock Greeting Widget</title>
   <style>
-    /* Force transparent everywhere possible */
-    :root, html, body { height: 100%; margin: 0; padding: 0; background: transparent !important; }
-    * { background: transparent !important; box-shadow: none !important; border: none !important; }
+    :root, html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #f7f6f3; /* matches Notion's default gray */
+    }
 
     body {
       font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      color: #000;                   /* black text */
+      color: #000;
       display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
-      padding: 18px;                 /* space like your screenshot */
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 24px;
       box-sizing: border-box;
-      background: transparent !important;
     }
 
-    /* Widget wrapper */
-    #widget {
-      display: inline-block;
-      text-align: left;
-      background: transparent;
+    .date {
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: lowercase;
+      margin-bottom: 6px;
     }
 
-    .date { font-size: 18px; font-weight: 700; text-transform: lowercase; margin-bottom: 6px; }
-    .time { font-size: 30px; font-weight: 800; margin-bottom: 6px; }
-    .greeting { font-size: 28px; font-weight: 800; text-transform: lowercase; }
+    .time {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
 
-    /* Reduce default selection highlights that may look odd on some embeds */
-    ::selection { background: rgba(0,0,0,0.06); }
+    .greeting {
+      font-size: 28px;
+      font-weight: 800;
+      text-transform: lowercase;
+    }
   </style>
 </head>
 <body>
-  <div id="widget" aria-live="polite">
-    <div class="date" id="date"></div>
-    <div class="time" id="time"></div>
-    <div class="greeting" id="greeting"></div>
-  </div>
+  <div class="date" id="date"></div>
+  <div class="time" id="time"></div>
+  <div class="greeting" id="greeting"></div>
 
   <script>
-    function pad(n){ return String(n).padStart(2,'0'); }
+    function pad(n) { return String(n).padStart(2, "0"); }
 
-    function update() {
+    function updateWidget() {
       const now = new Date();
 
-      // Date: "friday, october 3, 2025"
+      // Date: friday, october 3, 2025
       const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      document.getElementById('date').textContent = now.toLocaleDateString('en-US', options).toLowerCase();
+      document.getElementById("date").textContent =
+        now.toLocaleDateString("en-US", options).toLowerCase();
 
-      // Time: "9:05 AM" (hours + minutes)
+      // Time: 9:05 AM
       let hrs = now.getHours();
       let mins = pad(now.getMinutes());
-      let ampm = hrs >= 12 ? 'PM' : 'AM';
+      let ampm = hrs >= 12 ? "PM" : "AM";
       let displayH = hrs % 12 || 12;
-      document.getElementById('time').textContent = `${displayH}:${mins} ${ampm}`;
+      document.getElementById("time").textContent = `${displayH}:${mins} ${ampm}`;
 
-      // Greeting logic
-      const greeting = hrs < 12 ? 'good morning.' : (hrs < 18 ? 'good afternoon.' : 'good evening.');
-      document.getElementById('greeting').textContent = greeting;
-
-      // Double-ensure transparency in runtime (some hosts inject CSS)
-      try {
-        document.documentElement.style.background = 'transparent';
-        document.body.style.background = 'transparent';
-        document.getElementById('widget').style.background = 'transparent';
-      } catch (e) {}
+      // Greeting
+      let greeting;
+      if (hrs < 12) greeting = "good morning.";
+      else if (hrs < 18) greeting = "good afternoon.";
+      else greeting = "good evening.";
+      document.getElementById("greeting").textContent = greeting;
     }
 
-    update();
-    // update every 30s so minutes change quickly
-    setInterval(update, 30 * 1000);
+    updateWidget();
+    setInterval(updateWidget, 60 * 1000); // refresh every minute
   </script>
 </body>
 </html>
